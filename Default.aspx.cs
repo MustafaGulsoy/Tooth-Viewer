@@ -12,43 +12,39 @@ using Newtonsoft.Json;
 using Microsoft.SqlServer.Server;
 using System.Collections;
 using System.Drawing.Imaging;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Web.WebSockets;
 
 namespace YourNamespace
 {
     public partial class Default : System.Web.UI.Page
     {
+        private Dictionary<string, ToothInfo> toothDataDictionary = new Dictionary<string, ToothInfo>();
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                // Generate button texts
-                List<string> buttonTexts = new List<string>();
-                for (int i = 1; i <= 32; i++)
-                {
-                    buttonTexts.Add("Button " + i);
-                }
+                // Hasta bilgilerini ayarla
+                lblPatientInfo.Text = "Patient: John Smith<br>ID: 123456<br>DOB: 01/01/1980<br>X-ray Date: 02/15/2023";
 
-                // Bind the button texts to the Repeater
-                ButtonRepeater.DataSource = buttonTexts;
-                ButtonRepeater.DataBind();
+                // X-ray görüntüsünü ayarla
+
+                //imgXray.ImageUrl = "https://live-cms.s3.eu-south-1.amazonaws.com/imagen_3_radiografia_8eacffe05c.jpg";
+
+                // Diş butonlarını oluştur
+                //rptTeethButtons.DataSource = Enumerable.Range(1, 16);
+                //rptTeethButtons.DataBind();
+
+                // Çekim tarihini ayarla
+                lblCaptureDate.Text = "Capture Date: 02/15/2023";
 
 
 
                 /// Buradaki buttonlar servisten gelecek
 
 
-                List<ButtonData> buttonDataList = new List<ButtonData>();
-                Random rnd = new Random();
-                for (int i = 1; i <= 32; i++)
-                {
-                    buttonDataList.Add(new ButtonData
-                    {
-                        Text = "Button " + i,
-                        Top = rnd.Next(0, 300), // Random top position
-                        Left = rnd.Next(0, 300) // Random left position
-                    });
-                }
 
                 // Bind the button data to the Repeater
                 //ImageButtonsRepeater.DataSource = buttonDataList;
@@ -56,43 +52,113 @@ namespace YourNamespace
             }
         }
 
-        protected void ImageButtonsRepeater_ItemCommandAsync(object sender, EventArgs e)
+        protected async void BtnDraw_Click(object sender, EventArgs e)
         {
-            
+            await GetRandomImage();
         }
-        public async void GetRandomImage()
+        public async Task GetRandomImage()
         {
-
-
             string imagePath = "C:\\Projeler\\Bussines\\KardelenYazilim\\Projeler\\C#\\Tooth Viewer\\Resources\\Images\\";
 
             Random random = new Random();
-            ;
 
-            // Load the PNG file
-            using (System.Drawing.Image image = System.Drawing.Image.FromFile(Path.Combine( imagePath , random.Next(1, 7).ToString()) + ".png"))
+            using (System.Drawing.Image image = System.Drawing.Image.FromFile(Path.Combine(imagePath, random.Next(1, 7).ToString()) + ".png"))
             {
                 byte[] imageBytes = Utils.ImageToByteArray(image);
-                ToothXrayRequestBody data = new ToothXrayRequestBody();
-                data.ImageData = imageBytes;
-                string response =  await Utils.SendPostRequestAsync("/api/v1/XRayAnalysis/tooth-x-ray-analyze", data);
-                ToothXRayResponse data1 = JsonConvert.DeserializeObject<ToothXRayResponse>(response);
+                string imageBase64 = Convert.ToBase64String(imageBytes);
+                ToothXrayRequestBody data = new ToothXrayRequestBody { ImageData = imageBase64 };
+                string response = await Utils.SendPostRequestAsync("/api/v1/analyze/tooth-x-ray", data);
+                ToothXRayResponse responseData = JsonConvert.DeserializeObject<ToothXRayResponse>(response);
 
-                string base64String = Convert.ToBase64String(data1.ImageData);
-                ;
-                DynamicImage.Src = $"data:image/png;base64,{base64String}";
+                imgXray.ImageUrl = $"data:image/png;base64,{responseData.ImageData}";
 
+                // Clear existing buttons
+                buttonPlaceholder.Controls.Clear();
 
+                // Create new buttons based on the response
+                toothDataDictionary.Clear();
+                foreach (var item in responseData.ToothData)
+                {
+                    Label lbl = new Label();
+                    lbl.Text =  item.Key + " : " + item.Value;
+                    lbl.ID = item.Key;
+                    lbl.CssClass = "tooth-label";
+                    buttonPlaceholder.Controls.Add(lbl);
 
+                    // Generate mock data for each tooth
+                    toothDataDictionary[item.Key] = new ToothInfo
+                    {
+                        PatientName = "John Doe", // You can replace this with actual patient name
+                        Condition = item.Value // You can replace this with actual condition
+                    };
+                }
+
+                // Show the buttons container
+                buttonsScroll.Style["display"] = "block";
+                toothInfoContainer.Style["display"] = "none";
+            }
+        }
+        protected async void Test(object sender, EventArgs e)
+        {
+            await GetRandomImage();
+        }
+        protected void rptQuery_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item ||
+                e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                var buttonData = e.Item.DataItem as ButtonData;
+                var button = e.Item.FindControl("Button") as Button;
+
+              
+                button.Text = buttonData.Text;
+            }
+        }
+   
+        protected void ToothButton_Command(object sender, EventArgs e)
+        {
+            Button btn = sender as Button;
+            string toothId = btn.ID;
+            ShowToothInfo(toothId);
+        }
+        private void ShowToothInfo(string toothId)
+        {
+            if (toothDataDictionary.TryGetValue(toothId, out ToothInfo toothInfo))
+            {
+                toothInfoTitle.InnerText = $"Tooth {toothId} Information";
+                patientName.InnerText = toothInfo.PatientName;
+                toothCondition.InnerText = toothInfo.Condition;
+
+                buttonsScroll.Style["display"] = "none";
+                toothInfoContainer.Style["display"] = "block";
+            }
+        }
+
+        protected void BtnCloseToothInfo_Click(object sender, EventArgs e)
+        {
+            toothInfoContainer.Style["display"] = "none";
+            buttonsScroll.Style["display"] = "block";
+        }
+        protected void BtnBackToTeeth_Click(object sender, EventArgs e)
+        {
+            foreach (var item in toothDataDictionary)
+            {
+                Button btn = new Button();
+                btn.Text = "Tooth " + item.Key;
+                btn.CssClass = "tooth-button";
+                btn.ID = item.Key;
+                btn.Click += new EventHandler(ToothButton_Command);
+                buttonPlaceholder.Controls.Add(btn);
+
+                // Generate mock data for each tooth
+           
             }
 
 
+            toothInfoContainer.Style["display"] = "none";
+            buttonsScroll.Style["display"] = "block";
         }
 
-        protected void Test(object sender, EventArgs e)
-        {
-             GetRandomImage();
-        }
     }
 
 
@@ -100,7 +166,7 @@ namespace YourNamespace
 
     public static class Utils
     {
-        public static string url = "https://localhost:7099";
+        public static string url = "http://127.0.0.1:8000/";
 
         private static readonly HttpClient _client = new HttpClient();
 
@@ -139,8 +205,8 @@ namespace YourNamespace
         {
             try
             {
-                
-                
+
+
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(jsonPayload), Encoding.UTF8, "application/json");
 
                 // Add headers if provided
@@ -152,7 +218,7 @@ namespace YourNamespace
                     }
                 }
 
-                
+
                 HttpResponseMessage response = await _client.PostAsync(url + endpoint, content);
 
                 if (response.IsSuccessStatusCode)
@@ -177,24 +243,34 @@ namespace YourNamespace
                 return memoryStream.ToArray();
             }
         }
+    
+
+
+
     }
 
 
-   public class ToothXrayRequestBody
+
+    public class ToothXrayRequestBody
     {
-        public byte[] ImageData { get; set; }
-        public Dictionary<string, string> data { get; set; }
+        public string ImageData { get; set; }
+
     }
 
     public class ToothXRayResponse
     {
-        public byte[] ImageData { get; set; }
-        public string ToothData { get; set; }
+        public string ImageData { get; set; }
+        public Dictionary<string, string> ToothData { get; set; }
     }
     public class ButtonData
     {
         public string Text { get; set; }
         public int Top { get; set; }
         public int Left { get; set; }
+    }
+    public class ToothInfo
+    {
+        public string PatientName { get; set; }
+        public string Condition { get; set; }
     }
 }
