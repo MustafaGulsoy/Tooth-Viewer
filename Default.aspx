@@ -170,18 +170,56 @@
             padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
-        }.tooth-label {
-        display: block;
-        margin-bottom: 5px;
-        padding: 10px;
-        background-color: #f0f0f0;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .tooth-label:hover {
-        background-color: #e0e0e0;
-    }
+        }
+
+        .tooth-label {
+            display: block;
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .tooth-label:hover {
+                background-color: #e0e0e0;
+            }
+
+        .column {
+          
+         
+            display: flex;
+            flex-direction: column;
+            gap: 5px; /* Add some space between the checkboxes */
+        }
+
+        .green-button {
+ background-color: #32bc9b; /* Belirtilen açık yeşil renk */
+  border: none; /* Kenarlık yok */
+  color: #fff; /* Yazı rengi beyaz */
+  padding: 10px 20px; /* İç boşluk */
+  text-align: center; /* Metni ortala */
+  text-decoration: none; /* Alt çizgi yok */
+  display: inline-block; /* Satır içi blok */
+  font-size: 16px; /* Yazı boyutu */
+  margin: 10px 2px; /* Dış boşluk */
+  cursor: pointer; /* İmleci el şeklinde yapar */
+  border-radius: 5px; /* Köşeleri yuvarlat */
+  transition: background-color 0.3s, transform 0.3s; /* Geçiş efektleri */
+}
+
+/* Hover efekti */
+.green-button:hover {
+  background-color: #28a493; /* Hoverda daha koyu yeşil */
+  transform: scale(1.03); /* Butonu biraz büyüt */
+}
+
+/* Aktif durum efekti */
+.green-button:active {
+ background-color: #248f80; /* Aktif durumda daha koyu yeşil */
+  transform: scale(0.97); /* Butonu biraz küçült */
+}
     </style>
 </head>
 <body>
@@ -202,59 +240,22 @@
             <div class="buttons-container">
 
                 <div id="buttonsScroll" class="buttons-scroll" runat="server">
+                    <ul class="column">
+                        <li>
+                            <asp:CheckBox ID="HideSolid" runat="server" Text="Sağlıklı Dişleri Gizle" />
+                        </li>
+                        <li>
+                            <asp:CheckBox ID="HideMissing" runat="server" Text="Çekilmiş Dişleri Gizle" /></li>
+                        <li>
+                            <asp:CheckBox ID="HideAnomaly" runat="server" Text="Anomalileri Gizle" /></li>
 
-                    <asp:PlaceHolder ID="buttonPlaceholder" runat="server"></asp:PlaceHolder>
 
-                    <%--  <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 11" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 12" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 13" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 14" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 15" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 16" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 17" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 18" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 19" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 21" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 22" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 23" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 24" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 25" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 26" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 27" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 28" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 31" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 32" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 33" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 34" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 35" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 36" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 37" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 38" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 41" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 42" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 43" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 44" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 45" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 46" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 47" />
-                    <asp:Button CssClass="tooth-button" runat="server" Text="Tooth 48" />--%>
+                        <asp:Button CssClass="tooth-button" OnClick="CheckFilters_OnCheckedChanged" runat="server" Text="Filtre" />
+                        <asp:PlaceHolder ID="buttonPlaceholder" runat="server"></asp:PlaceHolder>
+                    </ul>
 
 
                     <!-- Add more buttons as needed -->
-                </div>
-            </div>
-            <div id="toothInfoContainer" class="tooth-info-container" runat="server">
-                <div class="tooth-info-content">
-                    <asp:Button ID="btnBackToTeeth" runat="server" Text="Back to Teeth" CssClass="back-button" OnClick="BtnBackToTeeth_Click" />
-                    <h2 id="toothInfoTitle" runat="server"></h2>
-                    <div class="info-item">
-                        <span class="info-label">Patient Name: </span>
-                        <span id="patientName" runat="server"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Condition: </span>
-                        <span id="toothCondition" runat="server"></span>
-                    </div>
                 </div>
             </div>
 
@@ -262,10 +263,10 @@
 
 
         <div class="tools">
-            <asp:Button ID="btnDraw" runat="server" Text="Change Image" OnClick="BtnDraw_Click" />
-            <asp:Button ID="btnAddText" runat="server" Text="Add Text" />
+            <asp:Button ID="btnDraw" CssClass="green-button" runat="server" Text="Change Image" OnClick="BtnDraw_Click" />
+   <%--         <asp:Button ID="btnAddText" runat="server" Text="Add Text" />
             <asp:Button ID="btnMarkAreas" runat="server" Text="Mark Areas" />
-            <asp:Button ID="btnCompareXrays" runat="server" Text="Compare X-rays" />
+            <asp:Button ID="btnCompareXrays" runat="server" Text="Compare X-rays" />--%>
         </div>
         <div class="footer">
             <asp:Label ID="lblCaptureDate" runat="server" />

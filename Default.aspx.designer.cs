@@ -51,6 +51,33 @@ namespace YourNamespace
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl buttonsScroll;
 
         /// <summary>
+        /// HideSolid control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox HideSolid;
+
+        /// <summary>
+        /// HideMissing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox HideMissing;
+
+        /// <summary>
+        /// HideAnomaly control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox HideAnomaly;
+
+        /// <summary>
         /// buttonPlaceholder control.
         /// </summary>
         /// <remarks>
@@ -60,51 +87,6 @@ namespace YourNamespace
         protected global::System.Web.UI.WebControls.PlaceHolder buttonPlaceholder;
 
         /// <summary>
-        /// toothInfoContainer control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toothInfoContainer;
-
-        /// <summary>
-        /// btnBackToTeeth control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnBackToTeeth;
-
-        /// <summary>
-        /// toothInfoTitle control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toothInfoTitle;
-
-        /// <summary>
-        /// patientName control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl patientName;
-
-        /// <summary>
-        /// toothCondition control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl toothCondition;
-
-        /// <summary>
         /// btnDraw control.
         /// </summary>
         /// <remarks>
@@ -112,33 +94,6 @@ namespace YourNamespace
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnDraw;
-
-        /// <summary>
-        /// btnAddText control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddText;
-
-        /// <summary>
-        /// btnMarkAreas control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnMarkAreas;
-
-        /// <summary>
-        /// btnCompareXrays control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCompareXrays;
 
         /// <summary>
         /// lblCaptureDate control.

@@ -15,6 +15,9 @@ using System.Drawing.Imaging;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Web.WebSockets;
+using Microsoft.Ajax.Utilities;
+using System.Net;
+using System.Security.Cryptography;
 
 namespace YourNamespace
 {
@@ -22,8 +25,19 @@ namespace YourNamespace
     {
         private Dictionary<string, ToothInfo> toothDataDictionary = new Dictionary<string, ToothInfo>();
 
+
+        public List<string> imageUrl = new List<string>();
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240807.114145.575.202408071152419.1&seriesUID=1.2.840.20240807.114145.575.202408071152419.2&objectUID=1.2.840.10008.20240807114352419&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240605.133724.411.202406060956162.1&seriesUID=1.2.840.20240605.133724.411.202406060956162.2&objectUID=1.2.840.10008.20240606092756162&contentType=image/json");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240604.134843.535.202406041447791.1&seriesUID=1.2.840.20240604.134843.535.202406041447791.2&objectUID=1.2.840.10008.20240604140047791&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240709.140033.566.202407091447601.1&seriesUID=1.2.840.20240709.140033.566.202407091447601.2&objectUID=1.2.840.10008.20240709140347601&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240604.134843.535.202406041447791.1&seriesUID=1.2.840.20240604.134843.535.202406041447791.2&objectUID=1.2.840.10008.20240604140047791&contentType=image/jpeg");
+            
+
             if (!IsPostBack)
             {
                 // Hasta bilgilerini ayarla
@@ -38,7 +52,8 @@ namespace YourNamespace
                 //rptTeethButtons.DataBind();
 
                 // Çekim tarihini ayarla
-                lblCaptureDate.Text = "Capture Date: 02/15/2023";
+                //lblCaptureDate.Text = "Capture Date: 02/15/2023";
+                lblCaptureDate.Text = "";
 
 
 
@@ -58,45 +73,61 @@ namespace YourNamespace
         }
         public async Task GetRandomImage()
         {
-            string imagePath = "C:\\Projeler\\Bussines\\KardelenYazilim\\Projeler\\C#\\Tooth Viewer\\Resources\\Images\\";
 
-            Random random = new Random();
 
-            using (System.Drawing.Image image = System.Drawing.Image.FromFile(Path.Combine(imagePath, random.Next(1, 7).ToString()) + ".png"))
-            {
-                byte[] imageBytes = Utils.ImageToByteArray(image);
-                string imageBase64 = Convert.ToBase64String(imageBytes);
-                ToothXrayRequestBody data = new ToothXrayRequestBody { ImageData = imageBase64 };
-                string response = await Utils.SendPostRequestAsync("/api/v1/analyze/tooth-x-ray", data);
-                ToothXRayResponse responseData = JsonConvert.DeserializeObject<ToothXRayResponse>(response);
 
-                imgXray.ImageUrl = $"data:image/png;base64,{responseData.ImageData}";
+            AuthInfo autInfo = new AuthInfo();
+            autInfo.institutionId = 1;
+            autInfo.userName = "PACS";
+            autInfo.passwordBase64 = "S2FybWVkMjAyNCst";
 
-                // Clear existing buttons
-                buttonPlaceholder.Controls.Clear();
-
-                // Create new buttons based on the response
-                toothDataDictionary.Clear();
-                foreach (var item in responseData.ToothData)
+            Dictionary<string, string> header = new Dictionary<string, string>
                 {
-                    Label lbl = new Label();
-                    lbl.Text =  item.Key + " : " + item.Value;
-                    lbl.ID = item.Key;
-                    lbl.CssClass = "tooth-label";
-                    buttonPlaceholder.Controls.Add(lbl);
+                    { "Authorization", "" }
+                };
 
-                    // Generate mock data for each tooth
-                    toothDataDictionary[item.Key] = new ToothInfo
-                    {
-                        PatientName = "John Doe", // You can replace this with actual patient name
-                        Condition = item.Value // You can replace this with actual condition
-                    };
-                }
 
-                // Show the buttons container
-                buttonsScroll.Style["display"] = "block";
-                toothInfoContainer.Style["display"] = "none";
+            header["Authorization"] = await Utils.SendPostRequestAsync("https://pacs.konyasm.gov.tr:30028/gateway/auth/api/v1/Token", JsonConvert.SerializeObject(autInfo));
+            header["Authorization"] = "bearer " + JsonConvert.DeserializeObject<AuthResponse>(header["Authorization"]).accessToken;
+
+            Random random= new Random();
+            ToothXrayRequestBody data = new ToothXrayRequestBody { image_url = imageUrl[random.Next(0, 5)] };
+
+            string response = await Utils.SendPostRequestAsync("http://127.0.0.1:8000/api/v1/teeth/analyze/tooth-x-ray-analysis", JsonConvert.SerializeObject(data), header);
+            ToothXRayResponse responseData = JsonConvert.DeserializeObject<ToothXRayResponse>(response);
+
+            imgXray.ImageUrl = $"data:image/png;base64,{responseData.result[0].image}";
+
+            string extraText = "";
+            //Clear existing buttons
+            buttonPlaceholder.Controls.Clear();
+            // Create new buttons based on the response
+            toothDataDictionary.Clear();
+            foreach (var item in responseData.result[0].data)
+            {
+                extraText = "";
+                Label lbl = new Label();
+                for (int i = 0; i < item.annotations.Length; i++)
+                    extraText += item.annotations[i].process_name + ", ";
+                if (item.annotations.Length > 0)
+                    extraText = "(" + extraText.Substring(0, extraText.Length - 2) + ")";
+                lbl.Text = item.teeth_number + " : " + item.status + extraText;
+                lbl.ID = item.teeth_number.ToString();
+                lbl.CssClass = "tooth-label";
+                buttonPlaceholder.Controls.Add(lbl);
+
+                // Generate mock data for each tooth
+                toothDataDictionary[item.teeth_number.ToString()] = new ToothInfo
+                {
+                    PatientName = "none", // You can replace this with actual patient name
+                    Condition = item.status + extraText  // You can replace this with actual condition
+                };
             }
+            Session["list"] = toothDataDictionary;
+            // Show the buttons container
+            buttonsScroll.Style["display"] = "block";
+
+
         }
         protected async void Test(object sender, EventArgs e)
         {
@@ -110,11 +141,13 @@ namespace YourNamespace
                 var buttonData = e.Item.DataItem as ButtonData;
                 var button = e.Item.FindControl("Button") as Button;
 
-              
+
                 button.Text = buttonData.Text;
             }
         }
-   
+
+
+
         protected void ToothButton_Command(object sender, EventArgs e)
         {
             Button btn = sender as Button;
@@ -123,40 +156,54 @@ namespace YourNamespace
         }
         private void ShowToothInfo(string toothId)
         {
-            if (toothDataDictionary.TryGetValue(toothId, out ToothInfo toothInfo))
-            {
-                toothInfoTitle.InnerText = $"Tooth {toothId} Information";
-                patientName.InnerText = toothInfo.PatientName;
-                toothCondition.InnerText = toothInfo.Condition;
+            //if (toothDataDictionary.TryGetValue(toothId, out ToothInfo toothInfo))
+            //{
+            //    toothInfoTitle.InnerText = $"Tooth {toothId} Information";
+            //    patientName.InnerText = toothInfo.PatientName;
+            //    toothCondition.InnerText = toothInfo.Condition;
 
-                buttonsScroll.Style["display"] = "none";
-                toothInfoContainer.Style["display"] = "block";
-            }
+            //    buttonsScroll.Style["display"] = "none";
+            //    toothInfoContainer.Style["display"] = "block";
+            //}
         }
 
         protected void BtnCloseToothInfo_Click(object sender, EventArgs e)
         {
-            toothInfoContainer.Style["display"] = "none";
-            buttonsScroll.Style["display"] = "block";
+            //toothInfoContainer.Style["display"] = "none";
+            //buttonsScroll.Style["display"] = "block";
         }
-        protected void BtnBackToTeeth_Click(object sender, EventArgs e)
+        protected void CheckFilters_OnCheckedChanged(object sender, EventArgs e)
         {
+            bool hideSolids = HideSolid.Checked;
+            bool hideAnomaly = HideAnomaly.Checked;
+            bool hideMissing = HideMissing.Checked;
+            toothDataDictionary = Session["list"] as Dictionary<string, ToothInfo>;
             foreach (var item in toothDataDictionary)
             {
-                Button btn = new Button();
-                btn.Text = "Tooth " + item.Key;
-                btn.CssClass = "tooth-button";
-                btn.ID = item.Key;
-                btn.Click += new EventHandler(ToothButton_Command);
-                buttonPlaceholder.Controls.Add(btn);
+
+                if (hideSolids && item.Value.Condition.Contains("Sağlam") && !item.Value.Condition.Contains(" )"))
+                    continue;
+
+
+                if (hideAnomaly && (item.Value.Condition.Contains(" )")))
+
+                    continue;
+
+                if (hideMissing && item.Value.Condition.Contains("Kayıp Diş"))
+                    continue;
+
+                Label lbl = new Label();
+                lbl.Text = item.Key + " : " + item.Value.Condition;
+                lbl.ID = item.Key;
+                lbl.CssClass = "tooth-label";
+                buttonPlaceholder.Controls.Add(lbl);
+
 
                 // Generate mock data for each tooth
-           
+
             }
 
 
-            toothInfoContainer.Style["display"] = "none";
-            buttonsScroll.Style["display"] = "block";
         }
 
     }
@@ -166,7 +213,7 @@ namespace YourNamespace
 
     public static class Utils
     {
-        public static string url = "http://127.0.0.1:8000/";
+        public static string url = "http://127.0.0.1:8000";
 
         private static readonly HttpClient _client = new HttpClient();
 
@@ -201,25 +248,28 @@ namespace YourNamespace
                 return $"Error: {ex.Message}";
             }
         }
-        public static async Task<string> SendPostRequestAsync(string endpoint, ToothXrayRequestBody jsonPayload, Dictionary<string, string> headers = null)
+        public static async Task<string> SendPostRequestAsync(string endpoint, string jsonPayload, Dictionary<string, string> headers = null)
         {
             try
             {
 
 
-                HttpContent content = new StringContent(JsonConvert.SerializeObject(jsonPayload), Encoding.UTF8, "application/json");
+                HttpContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 // Add headers if provided
                 if (headers != null)
                 {
                     foreach (var header in headers)
                     {
-                        content.Headers.Add(header.Key, header.Value);
+                        _client.DefaultRequestHeaders.Remove(header.Key);
+
+                        _client.DefaultRequestHeaders.Add(header.Key, header.Value);
+
                     }
                 }
 
 
-                HttpResponseMessage response = await _client.PostAsync(url + endpoint, content);
+                HttpResponseMessage response = await _client.PostAsync(endpoint, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -243,24 +293,51 @@ namespace YourNamespace
                 return memoryStream.ToArray();
             }
         }
-    
-
-
 
     }
-
-
 
     public class ToothXrayRequestBody
     {
-        public string ImageData { get; set; }
+        public string image_url { get; set; }
 
     }
 
+
+
     public class ToothXRayResponse
     {
-        public string ImageData { get; set; }
-        public Dictionary<string, string> ToothData { get; set; }
+        public ToothXRayData[] result { get; set; }
+    }
+
+    public class ToothXRayData
+    {
+        public string image { get; set; }
+        public ToothData[] data { get; set; }
+    }
+    public class ToothData
+    {
+        public int teeth_number { get; set; }
+        public string status { get; set; }
+        public Annotation[] annotations { get; set; }
+        public ill[] illness { get; set; }
+    }
+    public class Annotation
+    {
+        public string process_name { get; set; }
+        public float x_start { get; set; }
+        public float y_start { get; set; }
+        public float x_end { get; set; }
+        public float y_end { get; set; }
+
+    }
+    public class ill
+    {
+        public string process_name { get; set; }
+        public float x_start { get; set; }
+        public float y_start { get; set; }
+        public float x_end { get; set; }
+        public float y_end { get; set; }
+
     }
     public class ButtonData
     {
@@ -273,4 +350,24 @@ namespace YourNamespace
         public string PatientName { get; set; }
         public string Condition { get; set; }
     }
+    public class AuthInfo
+    {
+        public int institutionId { get; set; }
+        public string userName { get; set; }
+        public string passwordBase64 { get; set; }
+    }
+    public class AuthResponse
+    {
+        public int sid { get; set; }
+        public int institutionId { get; set; }
+        public int userId { get; set; }
+        public string userFullname { get; set; }
+        public string isPhysician { get; set; }
+        public string isAdmin { get; set; }
+        public string isSysAdmin { get; set; }
+        public string accessToken { get; set; }
+        public string refreshToken { get; set; }
+        public string expires { get; set; }
+    }
+
 }
