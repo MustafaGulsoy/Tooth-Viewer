@@ -104,9 +104,10 @@ namespace YourNamespace
             header["Authorization"] = "bearer " + JsonConvert.DeserializeObject<AuthResponse>(header["Authorization"]).accessToken;
 
             Random random= new Random();
-            ToothXrayRequestBody data = new ToothXrayRequestBody { image_url = imageUrl[random.Next(0, 4)] };
+            ToothXrayRequestBody data = new ToothXrayRequestBody { image_url = imageUrl[random.Next(0, imageUrl.Count)] };
 
-            string response = await Utils.SendPostRequestAsync("http://127.0.0.1:8000/api/v1/teeth/analyze/tooth-x-ray-analysis", JsonConvert.SerializeObject(data), header);
+            string response = await Utils.SendPostRequestAsync("http://localhost:8000/api/v1/teeth/analyze/tooth-x-ray-analysis", JsonConvert.SerializeObject(data), header);
+            Console.WriteLine(response);
             ToothXRayResponse responseData = JsonConvert.DeserializeObject<ToothXRayResponse>(response);
 
             imgXray.ImageUrl = $"data:image/png;base64,{responseData.result[0].image}";
