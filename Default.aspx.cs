@@ -31,7 +31,7 @@ namespace YourNamespace
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240807.114145.575.202408071152419.1&seriesUID=1.2.840.20240807.114145.575.202408071152419.2&objectUID=1.2.840.10008.20240807114352419&contenxtType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240807.114145.575.202408071152419.1&seriesUID=1.2.840.20240807.114145.575.202408071152419.2&objectUID=1.2.840.10008.20240807114352419&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240605.133724.411.202406060956162.1&seriesUID=1.2.840.20240605.133724.411.202406060956162.2&objectUID=1.2.840.10008.20240606092756162&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240709.140033.566.202407091447601.1&seriesUID=1.2.840.20240709.140033.566.202407091447601.2&objectUID=1.2.840.10008.20240709140347601&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240904.111029.058.202409041134248.1&seriesUID=1.2.840.20240904.111029.058.202409041134248.2&objectUID=1.2.840.10008.20240904111234248&contentType=image/jpeg");
