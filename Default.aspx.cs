@@ -2,22 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
-using System.Drawing;
-using Newtonsoft.Json.Serialization;
+
 using Newtonsoft.Json;
-using Microsoft.SqlServer.Server;
-using System.Collections;
-using System.Drawing.Imaging;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Web.WebSockets;
-using Microsoft.Ajax.Utilities;
-using System.Net;
-using System.Security.Cryptography;
+
 
 namespace YourNamespace
 {
@@ -36,16 +26,21 @@ namespace YourNamespace
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240709.140033.566.202407091447601.1&seriesUID=1.2.840.20240709.140033.566.202407091447601.2&objectUID=1.2.840.10008.20240709140347601&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240904.111029.058.202409041134248.1&seriesUID=1.2.840.20240904.111029.058.202409041134248.2&objectUID=1.2.840.10008.20240904111234248&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240827.152730.117.202408271522682.1&seriesUID=1.2.840.20240827.152730.117.202408271522682.2&objectUID=1.2.840.10008.20240827153022682&contentType=image/jpeg");
-            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240815.144704.499.202408151444334.1&seriesUID=1.2.840.20240815.144704.499.202408151444334.2&objectUID=1.2.840.10008.20240815144844334&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240820.083922.142.202408200825197.1&seriesUID=1.2.840.20240820.083922.142.202408200825197.2&objectUID=1.2.840.10008.20240820084125196&contentType=image/jpeg");
-            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240805.133941.391.202408051335181.1&seriesUID=1.2.840.20240805.133941.391.202408051335181.2&objectUID=1.2.840.10008.20240805134135181&contentType=image/jpeg");
             imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240719.095544.976.202407190909643.1&seriesUID=1.2.840.20240719.095544.976.202407190909643.2&objectUID=1.2.840.10008.20240719095709643&contentType=image/jpeg");
-            //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240708.112228.985.202407081137911.1&seriesUID=1.2.840.20240708.112228.985.202407081137911.2&objectUID=1.2.840.10008.20240708112537911&contentType=image/jpeg");
-            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240722.093425.690.202407220937022.1&seriesUID=1.2.840.20240722.093425.690.202407220937022.2&objectUID=1.2.840.10008.20240722093737022&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240708.112228.985.202407081137911.1&seriesUID=1.2.840.20240708.112228.985.202407081137911.2&objectUID=1.2.840.10008.20240708112537911&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240627.135059.995.202406271546020.1&seriesUID=1.2.840.20240627.135059.995.202406271546020.2&objectUID=1.2.840.10008.20240627152346020&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240705.135321.563.202407051306374.1&seriesUID=1.2.840.20240705.135321.563.202407051306374.2&objectUID=1.2.840.10008.20240705135506374&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240708.140301.859.202407081558360.1&seriesUID=1.2.840.20240708.140301.859.202407081558360.2&objectUID=1.2.840.10008.20240708155958360&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240724.093038.780.202407240945177.1&seriesUID=1.2.840.20240724.093038.780.202407240945177.2&objectUID=1.2.840.10008.20240724093445177&contentType=image/jpeg");
+            imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240724.113229.108.202407241131601.1&seriesUID=1.2.840.20240724.113229.108.202407241131601.2&objectUID=1.2.840.10008.20240724113431601&contentType=image/jpeg");
 
-            //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240819.094055.673.202408190922869.1&seriesUID=1.2.840.20240819.094055.673.202408190922869.2&objectUID=1.2.840.10008.20240819094222869&contentType=image/png");
 
 
+
+
+            //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240805.133941.391.202408051335181.1&seriesUID=1.2.840.20240805.133941.391.202408051335181.2&objectUID=1.2.840.10008.20240805134135181&contentType=image/jpeg");
+            //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240815.144704.499.202408151444334.1&seriesUID=1.2.840.20240815.144704.499.202408151444334.2&objectUID=1.2.840.10008.20240815144844334&contentType=image/jpeg");
 
             //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240708.093503.592.202407080954689.1&seriesUID=1.2.840.20240708.093503.592.202407080954689.2&objectUID=1.2.840.10008.20240708093654689&contentType=image/jpeg");
             //imageUrl.Add("https://pacs.konyasm.gov.tr:30028/gateway/pacs/dicom-web/wado?requestType=WADO&studyUID=1.2.840.20240806.141238.157.202408061430519.1&seriesUID=1.2.840.20240806.141238.157.202408061430519.2&objectUID=1.2.840.10008.20240806141430519&contentType=image/jpeg");
